@@ -1,91 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dulce Hogar - Reposteria</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
+  <style>
+    /* Pequenos ajustes visuales, no forman parte del sistema de grilla */
+    body { padding-top: 20px; }
+    .panel-heading { font-weight: bold; }
+    #estado-carga, #estado-vacio { padding: 40px 0; }
+  </style>
+</head>
+<body>
+
 <div class="container">
+
+  <!-- ============================= -->
+  <!-- 1. NAVEGACION -->
+  <!-- ============================= -->
+  <nav class="navbar navbar-default">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav-tienda" aria-expanded="false" aria-label="Abrir menu">
+        <span class="sr-only">Abrir menu de navegacion</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Dulce Hogar</a>
+
+      <!-- Carrito: FUERA del div.collapse a proposito, para que quede -->
+      <!-- siempre visible aunque el menu este colapsado en movil -->
+      <a href="#carrito" class="navbar-btn btn btn-default navbar-right" aria-label="Ver carrito, 3 productos">
+        &#128722; <span class="badge">3</span>
+      </a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="nav-tienda">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#catalogo">Catalogo</a></li>
+        <li><a href="#">Ofertas</a></li>
+        <li><a href="#">Mi cuenta</a></li>
+      </ul>
+    </div>
+  </nav>
+
   <div class="row">
 
-    <!-- Header / navegación -->
-    <header class="col-xs-12">
-      <nav class="navbar navbar-default" role="navigation">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#nav-blog" aria-expanded="false" aria-label="Abrir menu">
-            <span class="sr-only">Abrir menu de navegacion</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Mi Blog</a>
-        </div>
-        <div class="collapse navbar-collapse" id="nav-blog">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Inicio</a></li>
-            <li><a href="#">Tecnologia</a></li>
-            <li><a href="#">Diseno</a></li>
-            <li><a href="#">Sobre mi</a></li>
-          </ul>
-        </div>
-      </nav>
-    </header>
+    <!-- ============================= -->
+    <!-- 2. FILTROS (sidebar) -->
+    <!-- ============================= -->
+    <aside class="col-xs-12 col-sm-12 col-lg-3" aria-label="Filtros de productos">
 
-    <!-- Contenido principal -->
-    <main class="col-xs-12 col-sm-8 col-lg-9" id="contenido-principal">
-
-      <!-- Estado: listado de articulos -->
-      <section aria-label="Listado de articulos" id="listado-articulos">
-        <article class="media">
-          <div class="media-left">
-            <img class="media-object img-responsive" src="articulo-1.jpg" alt="Captura del articulo sobre arquitectura front-end">
-          </div>
-          <div class="media-body">
-            <h2><a href="#">Architectural concerns en front-end</a></h2>
-            <p class="text-muted">5 de agosto de 2026 &middot; por Equipo de Arquitectura</p>
-            <p>Como equilibrar diseno y operacion en interfaces modernas...</p>
-          </div>
-        </article>
-      </section>
-
-      <!-- Estado: carga -->
-      <section aria-live="polite" class="text-center" hidden id="estado-carga">
-        <span class="sr-only">Cargando mas articulos</span>
-        <span aria-hidden="true">Cargando...</span>
-      </section>
-
-      <!-- Estado: vacio -->
-      <section class="text-center" hidden id="estado-vacio">
-        <p>No hay articulos en esta categoria todavia.</p>
-      </section>
-
-      <!-- Estado: error -->
-      <section class="alert alert-danger" role="alert" hidden id="estado-error">
-        No se pudieron cargar los articulos. <button type="button" class="btn btn-link">Reintentar</button>
-      </section>
-
-      <nav aria-label="Paginacion de articulos">
-        <button type="button" class="btn btn-default">Cargar mas articulos</button>
-      </nav>
-    </main>
-
-    <!-- Sidebar -->
-    <aside class="col-xs-12 col-sm-4 col-lg-3" aria-label="Barra lateral">
       <div class="panel panel-default">
-        <div class="panel-heading">Buscar</div>
+        <div class="panel-heading">Categoria</div>
         <div class="panel-body">
-          <label for="buscador" class="sr-only">Buscar articulos</label>
-          <input type="search" id="buscador" class="form-control" placeholder="Buscar...">
+          <div class="radio">
+            <label><input type="radio" name="categoria" value="galletas" checked> Galletas</label>
+          </div>
+          <div class="radio">
+            <label><input type="radio" name="categoria" value="pasteles"> Pasteles</label>
+          </div>
+          <div class="radio">
+            <label><input type="radio" name="categoria" value="cocteles"> Cocteles</label>
+          </div>
         </div>
       </div>
 
-      <div class="panel panel-default">
-        <div class="panel-heading">Categorias</div>
-        <ul class="list-group">
-          <li class="list-group-item"><a href="#">Tecnologia</a></li>
-          <li class="list-group-item"><a href="#">Diseno</a></li>
-          <li class="list-group-item"><a href="#">Arquitectura</a></li>
-        </ul>
+      <!-- Este bloque cambiaria su contenido segun la categoria elegida -->
+      <!-- (requeriria JavaScript en una implementacion real) -->
+      <div class="panel panel-default" id="filtros-dinamicos">
+        <div class="panel-heading">Mas filtros</div>
+        <div class="panel-body">
+          <!-- Ejemplo mostrado cuando categoria = pasteles -->
+          <label for="fecha-entrega">Fecha de entrega</label>
+          <input type="date" id="fecha-entrega" class="form-control">
+
+          <!-- Ejemplo que solo apareceria si categoria = cocteles -->
+          <div class="checkbox" style="margin-top:15px">
+            <label>
+              <input type="checkbox" id="confirma-edad"> Confirmo que soy mayor de edad
+            </label>
+          </div>
+        </div>
       </div>
     </aside>
 
-    <!-- Footer -->
-    <footer class="col-xs-12">
-      <p class="text-center text-muted">&copy; 2026 Mi Blog</p>
-    </footer>
+    <!-- ============================= -->
+    <!-- 3. CATALOGO DE PRODUCTOS -->
+    <!-- ============================= -->
+    <main class="col-xs-12 col-sm-12 col-lg-9" id="catalogo">
 
+      <!-- Estado: carga (oculto por defecto, se muestra mientras llega la respuesta del servidor) -->
+      <section aria-live="polite" class="text-center" id="estado-carga" hidden>
+        <span class="sr-only">Cargando productos</span>
+        <span aria-hidden="true">Cargando productos...</span>
+      </section>
+
+      <!-- Estado: vacio (oculto por defecto, se muestra si el filtro no encuentra productos) -->
+      <section class="text-center" id="estado-vacio" hidden>
+        <p>No encontramos productos en "Pasteles sin gluten".</p>
+        <button type="button" class="btn btn-default">Quitar filtros</button>
+      </section>
+
+      <!-- Estado: error al cargar catalogo (oculto por defecto) -->
+      <div class="alert alert-danger" role="alert" id="estado-error-catalogo" hidden>
+        No se pudieron cargar los productos. <button type="button" class="btn btn-link">Reintentar</button>
+      </div>
+
+      <!-- Listado de productos: 4 por fila en escritorio, 2 en tablet, 1 en movil -->
+      <div class="row" aria-label="Listado de productos">
+
+        <article class="col-xs-12 col-sm-6 col-lg-3">
+          <div class="thumbnail">
+            <img src="galleta-chocolate.jpg" alt="Galleta de chocolate individual, decorada con trocitos de chocolate" class="img-responsive">
+            <div class="caption">
+              <h3>Galleta de chocolate</h3>
+              <p>$ 1.500</p>
+              <p><span aria-label="Contiene frutos secos">&#127826; Contiene frutos secos</span></p>
+              <button type="button" class="btn btn-primary btn-block">Agregar al carrito</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="col-xs-12 col-sm-6 col-lg-3">
+          <div class="thumbnail">
+            <img src="torta-frambuesa.jpg" alt="Torta de chocolate y frambuesa, vista completa" class="img-responsive">
+            <div class="caption">
+              <h3>Torta chocolate y frambuesa</h3>
+              <p class="text-muted"><s>$ 18.000</s> Agotado</p>
+              <button type="button" class="btn btn-default btn-block" disabled>No disponible</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="col-xs-12 col-sm-6 col-lg-3">
+          <div class="thumbnail">
+            <img src="coctel-mango.jpg" alt="Coctel de mango en vaso alto con decoracion" class="img-responsive">
+            <div class="caption">
+              <h3>Coctel de mango</h3>
+              <p>$ 4.500</p>
+              <button type="button" class="btn btn-primary btn-block">Agregar al carrito</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="col-xs-12 col-sm-6 col-lg-3">
+          <div class="thumbnail">
+            <img src="galleta-avena.jpg" alt="Galleta de avena y pasas individual" class="img-responsive">
+            <div class="caption">
+              <h3>Galleta de avena y pasas</h3>
+              <p>$ 1.300</p>
+              <button type="button" class="btn btn-primary btn-block">Agregar al carrito</button>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </main>
   </div>
+
+  <hr>
+
+  <!-- ============================= -->
+  <!-- 4. FICHA DE PRODUCTO -->
+  <!-- ============================= -->
+  <section class="row" aria-label="Ficha de producto">
+    <div class="col-xs-12 col-sm-6 col-lg-6">
+      <img src="torta-cumpleanos.jpg" alt="Torta de chocolate para cumpleanos, vista lateral" class="img-responsive">
+    </div>
+    <div class="col-xs-12 col-sm-6 col-lg-6">
+      <h1>Torta de chocolate para cumpleanos</h1>
+      <p class="lead">$ 22.990</p>
+
+      <div class="form-group">
+        <label for="cantidad">Cantidad</label>
+        <input type="number" id="cantidad" value="1" min="1" class="form-control" style="width:100px">
+      </div>
+
+      <div class="form-group">
+        <label for="mensaje-pastel">Mensaje para el pastel</label>
+        <input type="text" id="mensaje-pastel" class="form-control" placeholder="Ej: Feliz cumpleanos">
+      </div>
+
+      <!-- Estado: error al agregar al carrito (oculto por defecto) -->
+      <div class="alert alert-danger" role="alert" id="estado-error-carrito" hidden>
+        No se pudo agregar "Torta de chocolate x1, mensaje: Feliz cumpleanos Ana" al carrito.
+        Tu seleccion se mantiene guardada, intenta de nuevo.
+      </div>
+
+      <button type="button" class="btn btn-primary btn-lg">Agregar al carrito</button>
+    </div>
+  </section>
+
+  <footer class="row" style="margin-top:40px; margin-bottom:20px">
+    <div class="col-xs-12 text-center text-muted">
+      <p>&copy; 2026 Dulce Hogar</p>
+    </div>
+  </footer>
+
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</body>
+</html>
