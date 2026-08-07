@@ -1,0 +1,91 @@
+<div class="container">
+  <div class="row">
+
+    <!-- Header / navegación -->
+    <header class="col-xs-12">
+      <nav class="navbar navbar-default" role="navigation">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#nav-blog" aria-expanded="false" aria-label="Abrir menu">
+            <span class="sr-only">Abrir menu de navegacion</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Mi Blog</a>
+        </div>
+        <div class="collapse navbar-collapse" id="nav-blog">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Inicio</a></li>
+            <li><a href="#">Tecnologia</a></li>
+            <li><a href="#">Diseno</a></li>
+            <li><a href="#">Sobre mi</a></li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="col-xs-12 col-sm-8 col-lg-9" id="contenido-principal">
+
+      <!-- Estado: listado de articulos -->
+      <section aria-label="Listado de articulos" id="listado-articulos">
+        <article class="media">
+          <div class="media-left">
+            <img class="media-object img-responsive" src="articulo-1.jpg" alt="Captura del articulo sobre arquitectura front-end">
+          </div>
+          <div class="media-body">
+            <h2><a href="#">Architectural concerns en front-end</a></h2>
+            <p class="text-muted">5 de agosto de 2026 &middot; por Equipo de Arquitectura</p>
+            <p>Como equilibrar diseno y operacion en interfaces modernas...</p>
+          </div>
+        </article>
+      </section>
+
+      <!-- Estado: carga -->
+      <section aria-live="polite" class="text-center" hidden id="estado-carga">
+        <span class="sr-only">Cargando mas articulos</span>
+        <span aria-hidden="true">Cargando...</span>
+      </section>
+
+      <!-- Estado: vacio -->
+      <section class="text-center" hidden id="estado-vacio">
+        <p>No hay articulos en esta categoria todavia.</p>
+      </section>
+
+      <!-- Estado: error -->
+      <section class="alert alert-danger" role="alert" hidden id="estado-error">
+        No se pudieron cargar los articulos. <button type="button" class="btn btn-link">Reintentar</button>
+      </section>
+
+      <nav aria-label="Paginacion de articulos">
+        <button type="button" class="btn btn-default">Cargar mas articulos</button>
+      </nav>
+    </main>
+
+    <!-- Sidebar -->
+    <aside class="col-xs-12 col-sm-4 col-lg-3" aria-label="Barra lateral">
+      <div class="panel panel-default">
+        <div class="panel-heading">Buscar</div>
+        <div class="panel-body">
+          <label for="buscador" class="sr-only">Buscar articulos</label>
+          <input type="search" id="buscador" class="form-control" placeholder="Buscar...">
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">Categorias</div>
+        <ul class="list-group">
+          <li class="list-group-item"><a href="#">Tecnologia</a></li>
+          <li class="list-group-item"><a href="#">Diseno</a></li>
+          <li class="list-group-item"><a href="#">Arquitectura</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Footer -->
+    <footer class="col-xs-12">
+      <p class="text-center text-muted">&copy; 2026 Mi Blog</p>
+    </footer>
+
+  </div>
+</div>
