@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dulce Hogar - Reposteria</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="grid-sistema.css">
+  <style>
+    body { padding-top: 20px; }
+    .panel-heading { font-weight: bold; }
+    #estado-carga, #estado-vacio { padding: 40px 0; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <nav class="navbar navbar-default">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav-tienda" aria-expanded="false" aria-label="Abrir menu">
+        <span class="sr-only">Abrir menu de navegacion</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Dulce Hogar</a>
+    </div>
+
+    <a href="#carrito" class="navbar-btn btn btn-default navbar-right" aria-label="Ver carrito, 3 productos">
+      &#128722; <span class="badge">3</span>
+    </a>
+
+    <div class="collapse navbar-collapse" id="nav-tienda">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#catalogo">Catalogo</a></li>
+        <li><a href="#">Ofertas</a></li>
+        <li><a href="#">Mi cuenta</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="row">
+    <div class="col-xs-12">
+      <img src="https://placehold.co/1140x260?text=Banner+destacado" alt="Banner de productos destacados de la tienda" class="img-responsive" style="width:100%; margin-bottom:20px">
+    </div>
+  </div>
+
+  <div class="row">
+
+    <aside class="col-xs-12 col-sm-12 col-lg-3" aria-label="Filtros de productos">
+      <div class="panel-group" id="acordion-filtros" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab" id="titulo-categoria">
+            <h4 class="panel-title">
+              <a role="button" data-toggle="collapse" data-parent="#acordion-filtros"
+                 href="#panel-categoria" aria-expanded="true" aria-controls="panel-categoria">
+                Categoria
+              </a>
+            </h4>
+          </div>
+          <div id="panel-categoria" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="titulo-categoria">
+            <div class="panel-body">
+              <div class="radio">
+                <label><input type="radio" name="categoria" value="galletas" checked> Galletas</label>
+              </div>
+              <div class="radio">
+                <label><input type="radio" name="categoria" value="pasteles"> Pasteles</label>
+              </div>
+              <div class="radio">
+                <label><input type="radio" name="categoria" value="cocteles"> Cocteles</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="panel panel-default" id="filtros-dinamicos">
+          <div class="panel-heading" role="tab" id="titulo-mas-filtros">
+            <h4 class="panel-title">
+              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#acordion-filtros"
+                 href="#panel-mas-filtros" aria-expanded="false" aria-controls="panel-mas-filtros">
+                Mas filtros
+              </a>
+            </h4>
+          </div>
+          <div id="panel-mas-filtros" class="panel-collapse collapse" role="tabpanel" aria-labelledby="titulo-mas-filtros">
+            <div class="panel-body">
+              <label for="fecha-entrega">Fecha de entrega</label>
+              <input type="date" id="fecha-entrega" class="form-control">
+
+              <div class="checkbox" style="margin-top:15px">
+                <label>
+                  <input type="checkbox" id="confirma-edad"> Confirmo que soy mayor de edad
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="panel panel-default" aria-label="Resumen del carrito">
+        <div class="panel-heading">Carrito</div>
+        <div class="panel-body">
+          <p class="text-muted">3 productos</p>
+          <table class="table" style="margin-bottom:10px">
+            <tbody>
+              <tr>
+                <td>Envio</td>
+                <td class="text-right">$ 2.000</td>
+              </tr>
+              <tr>
+                <td><strong>Total</strong></td>
+                <td class="text-right"><strong>$ 8.300</strong></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="btn-group btn-group-justified">
+            <a href="#carrito" class="btn btn-default">Ver carrito</a>
+            <a href="#checkout" class="btn btn-primary">Finalizar compra</a>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default" aria-label="Producto destacado">
+        <div class="panel-heading">Destacado de la semana</div>
+        <div class="panel-body">
+          <img src="https://placehold.co/240x180?text=Destacado" alt="Torta especial destacada de la semana" class="img-responsive" style="margin-bottom:10px">
+          <h4 style="margin-top:0">Torta especial</h4>
+          <p>$ 15.990</p>
+        </div>
+      </div>
+    </aside>
+
+    <main class="col-xs-12 col-sm-12 col-lg-9" id="catalogo">
+
+      <section aria-live="polite" class="text-center" id="estado-carga" hidden>
+        <span class="sr-only">Cargando productos</span>
+        <span aria-hidden="true">Cargando productos...</span>
+      </section>
+
+      <section class="text-center" id="estado-vacio" hidden>
+        <p>No encontramos productos en "Pasteles sin gluten".</p>
+        <button type="button" class="btn btn-default">Quitar filtros</button>
+      </section>
+
+      <!-- Estado: error al cargar catalogo (oculto por defecto) -->
+      <div class="alert alert-danger" role="alert" id="estado-error-catalogo" hidden>
+        No se pudieron cargar los productos. <button type="button" class="btn btn-link">Reintentar</button>
+      </div>
+
+      <h2 id="titulo-catalogo">Productos destacados</h2>
+
+      <div class="row grid-row" aria-label="Listado de productos">
+
+        <article class="col-xs-12 col-sm-6 col-lg-4">
+          <div class="thumbnail grid-card">
+            <img src="https://placehold.co/300x220?text=Galleta+Chocolate" alt="Galleta de chocolate individual, decorada con trocitos de chocolate" class="img-responsive grid-card-media">
+            <div class="caption grid-card-body">
+              <h3>Galleta de chocolate</h3>
+              <p class="grid-truncate" data-max-chars="55">Galleta artesanal horneada diariamente con chispas de chocolate semiamargo y un toque de vainilla.</p>
+              <p><span aria-label="Contiene frutos secos">&#127826; Contiene frutos secos</span></p>
+              <div class="grid-card-footer">
+                <p class="grid-card-price">$ 1.500</p>
+                <button type="button" class="btn btn-primary grid-card-action">Comprar</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="col-xs-12 col-sm-6 col-lg-4">
+          <div class="thumbnail grid-card">
+            <img src="https://placehold.co/300x220?text=Torta+Frambuesa" alt="Torta de chocolate y frambuesa, vista completa" class="img-responsive grid-card-media">
+            <div class="caption grid-card-body">
+              <h3>Torta chocolate y frambuesa</h3>
+              <div class="grid-card-footer">
+                <p class="grid-card-price text-muted"><s>$ 18.000</s> Agotado</p>
+                <button type="button" class="btn btn-default grid-card-action" disabled>No disponible</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="col-xs-12 col-sm-6 col-lg-4">
+          <div class="thumbnail grid-card">
+            <img src="https://placehold.co/300x220?text=Coctel+Mango" alt="Coctel de mango en vaso alto con decoracion" class="img-responsive grid-card-media">
+            <div class="caption grid-card-body">
+              <h3>Coctel de mango</h3>
+              <div class="grid-card-footer">
+                <p class="grid-card-price">$ 4.500</p>
+                <button type="button" class="btn btn-primary grid-card-action">Comprar</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="col-xs-12 col-sm-6 col-lg-4">
+          <div class="thumbnail grid-card">
+            <img src="https://placehold.co/300x220?text=Galleta+Avena" alt="Galleta de avena y pasas individual" class="img-responsive grid-card-media">
+            <div class="caption grid-card-body">
+              <h3>Galleta de avena y pasas</h3>
+              <div class="grid-card-footer">
+                <p class="grid-card-price">$ 1.300</p>
+                <button type="button" class="btn btn-primary grid-card-action">Comprar</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </main>
+  </div>
+
+  <hr>
+
+  <section class="row" aria-label="Ficha de producto">
+    <div class="col-xs-12 col-sm-6 col-lg-6">
+      <img src="https://placehold.co/500x400?text=Torta+Cumpleanos" alt="Torta de chocolate para cumpleanos, vista lateral" class="img-responsive">
+    </div>
+    <div class="col-xs-12 col-sm-6 col-lg-6">
+      <h1>Torta de chocolate para cumpleanos</h1>
+      <p class="lead">$ 22.990</p>
+      <p class="grid-truncate" data-max-chars="80">Torta de bizcocho de chocolate humedo, relleno de manjar y cobertura de ganache, decorada a mano. Ideal para 12 a 15 personas. Se recomienda pedir con 48 horas de anticipacion para asegurar disponibilidad de decoracion personalizada.</p>
+
+      <div class="form-group">
+        <label for="cantidad">Cantidad</label>
+        <input type="number" id="cantidad" value="1" min="1" class="form-control" style="width:100px">
+      </div>
+
+      <div class="form-group">
+        <label for="mensaje-pastel">Mensaje para el pastel</label>
+        <input type="text" id="mensaje-pastel" class="form-control" placeholder="Ej: Feliz cumpleanos">
+      </div>
+
+      <div class="alert alert-danger" role="alert" id="estado-error-carrito" hidden>
+        No se pudo agregar "Torta de chocolate x1, mensaje: Feliz cumpleanos Ana" al carrito.
+        Tu seleccion se mantiene guardada, intenta de nuevo.
+      </div>
+
+      <button type="button" class="btn btn-primary btn-lg">Agregar al carrito</button>
+    </div>
+  </section>
+
+  <hr>
+
+  <section aria-label="Productos relacionados">
+    <h2>Tambien te puede interesar</h2>
+    <div class="row grid-row">
+
+      <article class="col-xs-12 col-sm-4 col-lg-4">
+        <div class="thumbnail grid-card">
+          <img src="https://placehold.co/300x220?text=Cupcakes" alt="Caja de seis cupcakes decorados" class="img-responsive grid-card-media">
+          <div class="caption grid-card-body">
+            <h3>Caja de 6 cupcakes</h3>
+            <div class="grid-card-footer">
+              <p class="grid-card-price">$ 6.000</p>
+              <button type="button" class="btn btn-primary grid-card-action">Comprar</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="col-xs-12 col-sm-4 col-lg-4">
+        <div class="thumbnail grid-card">
+          <img src="https://placehold.co/300x220?text=Vela+Cumpleanos" alt="Set de velas de cumpleanos numericas" class="img-responsive grid-card-media">
+          <div class="caption grid-card-body">
+            <h3>Set de velas numericas</h3>
+            <p class="text-muted">Solo disponible en tiendas fisicas</p>
+            <div class="grid-card-footer">
+              <p class="grid-card-price">$ 2.500</p>
+              <button type="button" class="btn btn-primary grid-card-action">Comprar</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="col-xs-12 col-sm-4 col-lg-4">
+        <div class="thumbnail grid-card">
+          <img src="https://placehold.co/300x220?text=Coctel+Frutilla" alt="Coctel de frutilla en copa decorada" class="img-responsive grid-card-media">
+          <div class="caption grid-card-body">
+            <h3>Coctel de frutilla</h3>
+            <div class="grid-card-footer">
+              <p class="grid-card-price">$ 4.200</p>
+              <button type="button" class="btn btn-primary grid-card-action">Comprar</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <footer class="row" style="margin-top:40px; margin-bottom:20px">
+    <div class="col-xs-12 text-center text-muted">
+      <p>&copy; 2026 Dulce Hogar</p>
+    </div>
+  </footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="grid-sistema.js" defer></script>
+</body>
+</html>
