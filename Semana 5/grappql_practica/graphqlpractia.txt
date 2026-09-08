@@ -1,0 +1,75 @@
+directive @auth on FIELD_DEFINITION
+directive @hasScope(scope: String!) on FIELD_DEFINITION
+
+type EmpresaInfo {
+  telefono: String!
+  correo: String!
+  mision: String!
+}
+
+type Producto {
+  id: ID!
+  nombre: String!
+  precio: Int!
+  descripcion: String!
+  imagen: String!
+}
+
+type Oferta {
+  producto: Producto!
+  precioOriginal: Int!
+  precioOferta: Int!
+}
+
+type Servicio {
+  id: ID!
+  nombre: String!
+  precio: Int!
+}
+
+type ItemCarrito {
+  producto: Producto!
+  cantidad: Int!
+  subtotal: Int!
+}
+
+input ItemCarritoInput {
+  productoId: ID!
+  cantidad: Int! = 1
+}
+
+type Carrito {
+  items: [ItemCarrito!]!
+  total: Int!
+}
+
+type ResultadoProductos {
+  items: [Producto!]!
+  paginaActual: Int!
+  totalPaginas: Int!
+  totalItems: Int!
+}
+
+type ConfirmacionPago {
+  exito: Boolean!
+  mensaje: String!
+  ordenId: ID
+}
+
+type Query {
+  empresaInfo: EmpresaInfo!
+  productos(buscar: String, pagina: Int = 1, limite: Int = 9): ResultadoProductos!
+  producto(id: ID!): Producto
+  ofertaDelDia: Oferta!
+  servicios: [Servicio!]!
+  servicio(id: ID!): Servicio
+  carrito: Carrito! @auth
+}
+
+type Mutation {
+  agregarAlCarrito(input: ItemCarritoInput!): Carrito! @auth
+  eliminarDelCarrito(productoId: ID!): Carrito! @auth
+  vaciarCarrito: Boolean! @auth
+  procesarPago(metodoPago: String!): ConfirmacionPago! @auth @hasScope(scope: "checkout:write")
+  crearServicio(nombre: String!, precio: Int!): Servicio! @auth @hasScope(scope: "services:admin")
+}
