@@ -1,0 +1,17 @@
+{
+  "name": "chocomania-graphql",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fastify": "^5.12.4",
+    "mercurius": "^16.10.0",
+    "mongodb": "^7.6.0"
+  }
+}
