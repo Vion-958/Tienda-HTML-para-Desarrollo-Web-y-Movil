@@ -1,0 +1,6 @@
+# Para correr los servicios sin Docker y todas las pruebas
+fastapi
+uvicorn[standard]
+httpx
+pytest
+pytest-playwright
