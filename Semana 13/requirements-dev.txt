@@ -1,0 +1,8 @@
+# Para correr los servicios sin Docker, la mensajería y todas las pruebas
+fastapi
+uvicorn[standard]
+httpx
+python-multipart
+stomp.py>=8.1
+pytest
+pytest-playwright
