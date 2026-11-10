@@ -1,0 +1,78 @@
+type Cliente {
+  nombre: String!
+  email: String!
+  telefono: String!
+  comuna: String!
+}
+
+type Evento {
+  estadoAnterior: String
+  estadoNuevo: String!
+  creado: String!
+}
+
+type Item {
+  productoId: String!
+  nombre: String!
+  cantidad: Int!
+  precioUnitario: Int!
+  subtotal: Int!
+
+  """Datos actuales del catalogo (inventory)"""
+  producto: Producto
+}
+
+type PaginaPedidos {
+  pedidos: [Pedido!]!
+  total: Int!
+  pagina: Int!
+}
+
+type Pago {
+  id: String!
+  estado: String!
+  metodo: String!
+  monto: Int!
+}
+
+type Pedido {
+  id: Int!
+  estado: String!
+  entrega: String!
+  comuna: String!
+  direccion: String!
+  metodoPago: String!
+  subtotal: Int!
+  costoEnvio: Int!
+  total: Int!
+  creado: String!
+  items: [Item!]!
+
+  """Ultimo pago (payments)"""
+  pago: Pago
+
+  """Perfil del cliente (clients). Solo el dueno o un admin."""
+  cliente: Cliente
+
+  """Historial de estados. Solo en la consulta 'pedido'."""
+  eventos: [Evento!]
+}
+
+type Producto {
+  id: String!
+  nombre: String!
+  imagen: String
+  disponible: Boolean!
+  activo: Boolean!
+}
+
+type Query {
+  """Pedidos del usuario autenticado, con productos y pago"""
+  misPedidos(pagina: Int! = 1, tamano: Int! = 10): PaginaPedidos!
+
+  """Un pedido propio (o cualquiera si es admin), con historial"""
+  pedido(id: Int!): Pedido
+
+  """Todos los pedidos. Solo rol admin."""
+  pedidosAdmin(estado: String = null, pagina: Int! = 1, tamano: Int! = 10): PaginaPedidos!
+}

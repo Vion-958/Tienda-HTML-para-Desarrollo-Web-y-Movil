@@ -1,0 +1,97 @@
+---
+title: UML del API Gateway, politicas y GraphQL Gateway
+---
+classDiagram
+    direction TB
+
+    class ApiGateway {
+        +RUTAS: list~RouteDefinition~
+        +buscarRuta(metodo, path) RouteDefinition
+        +reenviar(ruta, usuario) Response
+        +login() / register() / me() / logout()
+    }
+    class RouteDefinition {
+        +id: S01..S19
+        +metodo: str
+        +patron: regex
+        +servicio: ServiceTarget
+        +destino: str
+        +acceso: anonimo|sesion|admin
+        +limite: int por minuto
+        +timeout: float
+    }
+    class AuthenticationPolicy {
+        +identidad(cookie) Usuario
+    }
+    class AuthorizationPolicy {
+        +autorizar(ruta, usuario)
+    }
+    class RateLimiter {
+        +permitir(ip, clave, limite) bool
+        +excedido(ip, clave, limite) bool
+    }
+    class ErrorMapper {
+        +timeout() 504
+        +sinConexion() 503
+        +credencialRechazada() 503
+    }
+    class SecretProvider {
+        -cache: dict
+        -ttl: 30 s
+        -gracia: 300 s
+        +obtener() dict
+    }
+    class ServiceTarget {
+        +nombre: str
+        +url: str
+    }
+    class ServiceIdentity {
+        +cabeceras(nombre, token, request_id, usuario) dict
+    }
+    class VerificadorServicio {
+        <<en cada servicio>>
+        -credenciales: dict
+        +requiere(llamadores, con_usuario, admin)
+    }
+    class GraphQLGateway {
+        +schema: Schema
+        +contexto(request) Contexto
+    }
+    class Schema {
+        +Query: misPedidos, pedido, pedidosAdmin
+        +limites: profundidad 6, alias 10, tokens 1500
+        +introspeccion desactivada
+    }
+    class Resolver {
+        +misPedidos() PaginaPedidos
+        +pedido(id) Pedido
+        +pedidosAdmin(estado) PaginaPedidos
+    }
+    class DataLoader {
+        +productos / pagos / clientes
+        +una llamada por tipo y consulta
+    }
+    class Vault {
+        <<externo>>
+        secret/gateway
+    }
+    class AuthService {
+        <<servicio privado>>
+    }
+
+    ApiGateway "1" *-- "1..*" RouteDefinition : publica
+    RouteDefinition "0..*" --> "1" ServiceTarget : destino
+    ApiGateway "1" *-- "1" AuthenticationPolicy
+    ApiGateway "1" *-- "1" AuthorizationPolicy
+    ApiGateway "1" *-- "1" RateLimiter
+    ApiGateway "1" *-- "1" ErrorMapper
+    ApiGateway "1" *-- "1" SecretProvider
+    AuthenticationPolicy ..> AuthService : introspect
+    SecretProvider ..> Vault : lee credenciales
+    ApiGateway ..> ServiceIdentity : firma cada llamada
+    ServiceTarget <|-- GraphQLGateway
+    GraphQLGateway "1" *-- "1" Schema
+    Schema "1" *-- "3" Resolver
+    Resolver ..> DataLoader : batching
+    DataLoader ..> ServiceIdentity : credencial propia
+    ServiceIdentity ..> VerificadorServicio : la valida

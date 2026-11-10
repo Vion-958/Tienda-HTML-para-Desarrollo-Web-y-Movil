@@ -1,0 +1,146 @@
+# ChocoMania con contenedores (alternativa a iniciar.py). Ver README.
+# Redes: publica (gateway, sitio, pasarela), privada (interna), proveedor (payments-pasarela).
+
+
+x-servicio: &servicio
+  build: .
+  restart: unless-stopped
+  networks: [privada]
+
+services:
+  vault:
+    image: hashicorp/vault:1.17
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_TOKEN}
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+    cap_add: [IPC_LOCK]
+    networks: [privada]
+
+  vault-init:
+    image: hashicorp/vault:1.17
+    depends_on: [vault]
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${VAULT_TOKEN}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        until vault status >/dev/null 2>&1; do sleep 1; done;
+        vault kv put secret/gateway auth="$$GATEWAY_AUTH" inventory="$$GATEWAY_INVENTORY"
+        orders="$$GATEWAY_ORDERS" clients="$$GATEWAY_CLIENTS" payments="$$GATEWAY_PAYMENTS"
+        graphql="$$GATEWAY_GRAPHQL"
+    env_file: .env
+    networks: [privada]
+
+  auth:
+    <<: *servicio
+    working_dir: /app/servicios/auth-service
+    command: uvicorn app:app --host 0.0.0.0 --port 8100
+    environment:
+      SERVICE_CALLERS: '{"gateway": "${GATEWAY_AUTH}"}'
+    volumes: [auth-data:/app/servicios/auth-service/data]
+
+  inventory:
+    <<: *servicio
+    working_dir: /app/servicios/inventory
+    command: uvicorn app:app --host 0.0.0.0 --port 9101
+    environment:
+      SERVICE_CALLERS: '{"gateway": "${GATEWAY_INVENTORY}", "orders": "${ORDERS_INVENTORY}", "graphql": "${GRAPHQL_INVENTORY}"}'
+    volumes: [inventory-data:/app/servicios/inventory/data]
+
+  clients:
+    <<: *servicio
+    working_dir: /app/servicios/clients
+    command: uvicorn app:app --host 0.0.0.0 --port 9103
+    environment:
+      SERVICE_CALLERS: '{"gateway": "${GATEWAY_CLIENTS}", "graphql": "${GRAPHQL_CLIENTS}"}'
+    volumes: [clients-data:/app/servicios/clients/data]
+
+  orders:
+    <<: *servicio
+    working_dir: /app/servicios/orders
+    command: uvicorn app:app --host 0.0.0.0 --port 9102
+    environment:
+      SERVICE_CALLERS: '{"gateway": "${GATEWAY_ORDERS}", "payments": "${PAYMENTS_ORDERS}", "graphql": "${GRAPHQL_ORDERS}"}'
+      INVENTORY_URL: http://inventory:9101
+      ORDERS_INVENTORY_TOKEN: ${ORDERS_INVENTORY}
+    volumes: [orders-data:/app/servicios/orders/data]
+
+  payments:
+    <<: *servicio
+    working_dir: /app/servicios/payments
+    command: uvicorn app:app --host 0.0.0.0 --port 9104
+    environment:
+      SERVICE_CALLERS: '{"gateway": "${GATEWAY_PAYMENTS}", "graphql": "${GRAPHQL_PAYMENTS}"}'
+      ORDERS_URL: http://orders:9102
+      PAYMENTS_ORDERS_TOKEN: ${PAYMENTS_ORDERS}
+      PASARELA_URL: http://pasarela:9300
+      PASARELA_API_KEY: ${PASARELA_API_KEY}
+      PASARELA_WEBHOOK_SECRET: ${PASARELA_WEBHOOK_SECRET}
+      PUBLIC_URL: http://localhost:8000
+      WEBHOOK_URL: http://gateway:8000/api/payments/webhook
+    networks: [privada, proveedor]
+    volumes: [payments-data:/app/servicios/payments/data]
+
+  graphql:
+    <<: *servicio
+    working_dir: /app/servicios/graphql-gateway
+    command: uvicorn app:app --host 0.0.0.0 --port 9200
+    environment:
+      SERVICE_CALLERS: '{"gateway": "${GATEWAY_GRAPHQL}"}'
+      ORDERS_URL: http://orders:9102
+      INVENTORY_URL: http://inventory:9101
+      PAYMENTS_URL: http://payments:9104
+      CLIENTS_URL: http://clients:9103
+      GRAPHQL_ORDERS_TOKEN: ${GRAPHQL_ORDERS}
+      GRAPHQL_INVENTORY_TOKEN: ${GRAPHQL_INVENTORY}
+      GRAPHQL_PAYMENTS_TOKEN: ${GRAPHQL_PAYMENTS}
+      GRAPHQL_CLIENTS_TOKEN: ${GRAPHQL_CLIENTS}
+
+  gateway:
+    <<: *servicio
+    working_dir: /app/servicios/api-gateway
+    command: uvicorn app:app --host 0.0.0.0 --port 8000
+    depends_on: [vault-init, auth, inventory, orders, clients, payments, graphql, sitio]
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${VAULT_TOKEN}
+      AUTH_URL: http://auth:8100
+      INVENTORY_URL: http://inventory:9101
+      ORDERS_URL: http://orders:9102
+      CLIENTS_URL: http://clients:9103
+      PAYMENTS_URL: http://payments:9104
+      GRAPHQL_URL: http://graphql:9200
+      FRONTEND_URL: http://sitio:8080
+    ports: ["8000:8000"]
+    networks: [publica, privada]
+
+  sitio:
+    image: php:8.3-cli
+    command: php -S 0.0.0.0:8080 -t /sitio
+    volumes: [./chocomania-frontend:/sitio:ro]
+    networks: [publica]
+
+  pasarela:
+    <<: *servicio
+    working_dir: /app/servicios/pasarela-sandbox
+    command: uvicorn app:app --host 0.0.0.0 --port 9300
+    environment:
+      PASARELA_API_KEY: ${PASARELA_API_KEY}
+      PASARELA_WEBHOOK_SECRET: ${PASARELA_WEBHOOK_SECRET}
+      PASARELA_PUBLIC_URL: http://localhost:9300
+    ports: ["9300:9300"]
+    networks: [publica, proveedor]
+
+networks:
+  publica:
+  privada:
+    internal: true
+  proveedor:
+
+volumes:
+  auth-data:
+  inventory-data:
+  clients-data:
+  orders-data:
+  payments-data:

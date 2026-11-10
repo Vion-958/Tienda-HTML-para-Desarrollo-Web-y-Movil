@@ -1,0 +1,8 @@
+servicios/*/data
+logs
+**/__pycache__
+.venv
+.env
+pruebas
+docs
+mensajeria

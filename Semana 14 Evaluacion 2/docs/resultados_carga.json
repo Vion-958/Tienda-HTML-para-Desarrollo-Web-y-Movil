@@ -1,0 +1,44 @@
+[
+  {
+    "escenario": "catalogo",
+    "usuarios": 20,
+    "segundos": 20.1,
+    "solicitudes": 5767,
+    "throughput_rps": 287.4,
+    "p50_ms": 62.0,
+    "p95_ms": 121.2,
+    "p99_ms": 163.9,
+    "media_ms": 69.1,
+    "errores": 0,
+    "tasa_error": 0.0,
+    "objetivo_p95_ms": 500
+  },
+  {
+    "escenario": "mis_pedidos_graphql",
+    "usuarios": 20,
+    "segundos": 20.1,
+    "solicitudes": 1451,
+    "throughput_rps": 72.1,
+    "p50_ms": 263.9,
+    "p95_ms": 394.8,
+    "p99_ms": 479.9,
+    "media_ms": 274.8,
+    "errores": 0,
+    "tasa_error": 0.0,
+    "objetivo_p95_ms": 800
+  },
+  {
+    "escenario": "crear_y_cancelar_pedido",
+    "usuarios": 20,
+    "segundos": 20.3,
+    "solicitudes": 1066,
+    "throughput_rps": 52.6,
+    "p50_ms": 365.0,
+    "p95_ms": 543.0,
+    "p99_ms": 726.4,
+    "media_ms": 377.1,
+    "errores": 0,
+    "tasa_error": 0.0,
+    "objetivo_p95_ms": 1000
+  }
+]
