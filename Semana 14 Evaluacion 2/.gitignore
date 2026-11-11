@@ -1,0 +1,8 @@
+# Bases SQLite y logs generados al ejecutar
+servicios/*/data/
+logs/
+.venv/
+__pycache__/
+.pytest_cache/
+test-results/
+.env

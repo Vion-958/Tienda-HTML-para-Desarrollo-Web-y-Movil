@@ -1,0 +1,44 @@
+---
+title: Mapa de componentes y despliegue
+---
+flowchart LR
+    nav([Navegador<br>visitante / cliente / admin])
+
+    subgraph publica[Red publica]
+        gw[API Gateway :8000<br>rutas, sesion, roles,<br>limites, X-Request-ID]
+        sitio[Sitio PHP :8080<br>solo via Gateway]
+        pas[Pasarela sandbox :9300<br>proveedor externo]
+    end
+
+    subgraph privada[Red privada - sin acceso desde el navegador]
+        auth[Auth Service :8100]
+        vault[(Vault :8200)]
+        gql[GraphQL Gateway :9200]
+        inv[inventory :9101]
+        ord[orders :9102]
+        cli[clients :9103]
+        pay[payments :9104]
+        dbA[(identity.db)]
+        dbI[(inventory.db)]
+        dbO[(orders.db)]
+        dbC[(clients.db)]
+        dbP[(payments.db)]
+    end
+
+    nav -- HTTPS cookie HttpOnly --> gw
+    nav -- pagina de pago --> pas
+    gw --> sitio
+    gw -- secretos --> vault
+    gw -- login / introspect --> auth
+    gw -- REST + credencial --> inv & ord & cli & pay
+    gw -- POST /graphql --> gql
+    gql -- lotes --> inv & ord & cli & pay
+    ord -- reservar / liberar stock --> inv
+    pay -- monto / marcar pagado --> ord
+    pay -- crear checkout --> pas
+    pas -- aviso firmado HMAC --> gw
+    auth --- dbA
+    inv --- dbI
+    ord --- dbO
+    cli --- dbC
+    pay --- dbP
