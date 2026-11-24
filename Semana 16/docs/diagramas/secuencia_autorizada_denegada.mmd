@@ -1,0 +1,28 @@
+---
+title: Secuencia - solicitud autorizada y denegada
+---
+sequenceDiagram
+    actor U as ana (rol user)
+    participant G as API Gateway
+    participant A as Auth Service
+    participant O as orders
+
+    Note over U,O: Autorizada: GET /api/orders/1003 (pedido propio)
+    U->>G: GET /api/orders/1003 + cookie
+    G->>G: ruta S09 existe, limite OK
+    G->>A: introspect
+    A-->>G: USR-001, roles [user]
+    G->>O: GET /orders/1003 + credencial + X-User-Id USR-001
+    O->>O: user_id del pedido == USR-001
+    O-->>U: 200 pedido
+
+    Note over U,O: Denegada por propiedad: GET /api/orders/1002 (de ernesto)
+    U->>G: GET /api/orders/1002 + X-User-Roles admin (falso)
+    G->>G: descarta cabeceras del navegador
+    G->>O: GET /orders/1002 + X-User-Id USR-001
+    O-->>U: 404 (no revela que existe)
+
+    Note over U,O: Denegada por rol: DELETE /api/products/choco-1
+    U->>G: DELETE /api/products/choco-1
+    G->>G: ruta S06 requiere admin
+    G-->>U: 403 (no llega a inventory)
