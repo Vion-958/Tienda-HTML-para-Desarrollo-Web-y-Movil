@@ -1,0 +1,18 @@
+---
+title: Rotacion de la credencial orders -> inventory sin reiniciar
+---
+sequenceDiagram
+    autonumber
+    participant R as rotar.py
+    participant V as Vault
+    participant O as orders
+    participant I as inventory
+    R->>V: secret/inventory: llamador_orders = "nueva,anterior"
+    R->>V: secret/orders: token_inventory = "nueva"
+    Note over O,I: Durante el cambio, inventory acepta las dos
+    O->>V: cache vencida (TTL 30 s): relee secret/orders
+    O->>I: llamada con la credencial nueva
+    I->>V: credencial desconocida: relee secret/inventory
+    I-->>O: 200 OK
+    R->>V: tras el TTL: llamador_orders = "nueva"
+    Note over I: La anterior deja de servir cuando vence la cache de inventory

@@ -1,0 +1,44 @@
+---
+title: Secuencia - compra con pago por tarjeta
+---
+sequenceDiagram
+    autonumber
+    actor C as Cliente (navegador)
+    participant G as API Gateway
+    participant A as Auth Service
+    participant O as orders
+    participant I as inventory
+    participant P as payments
+    participant X as Pasarela sandbox
+
+    C->>G: POST /api/orders {items, entrega} (cookie)
+    G->>A: introspect(token)
+    A-->>G: identidad USR-001
+    G->>O: POST /orders + credencial gateway + X-User-*
+    O->>I: POST /internal/reservations {pedido_id, items}
+    alt hay stock
+        I-->>O: precios oficiales (stock apartado)
+        O-->>G: 201 pedido pendiente_pago, total del servidor
+    else sin stock
+        I-->>O: 409
+        O-->>G: 409 (pedido descartado)
+    else inventory no responde
+        O->>I: liberar (compensacion idempotente)
+        O-->>G: 503 (pedido fallido, invisible)
+    end
+    G-->>C: respuesta
+    C->>G: POST /api/payments {pedido_id}
+    G->>P: POST /payments
+    P->>O: GET /internal/orders/{id} (monto real)
+    P->>X: crear checkout (API key)
+    X-->>P: url de pago
+    P-->>C: redirect_url (via Gateway)
+    C->>X: aprueba en la pagina del proveedor
+    X->>G: POST /api/payments/webhook (firma HMAC)
+    G->>P: aviso (sin sesion: confia en la firma)
+    P->>P: verifica firma, tiempo, monto y evento no repetido
+    P->>O: POST /internal/orders/{id}/paid
+    O->>I: confirmar reserva
+    O-->>P: pagado
+    P-->>X: 200 (si falla, 503 y el proveedor reintenta)
+    X-->>C: redirige a cuenta.php?pago=aprobado

@@ -1,0 +1,157 @@
+---
+title: UML del dominio y servicios publicos - ChocoMania
+---
+classDiagram
+    direction LR
+
+    class Usuario {
+        <<auth>>
+        +user_id: str
+        +username: str
+        -sal: str
+        -hash: str
+        +roles: list~str~
+    }
+    class Sesion {
+        <<auth>>
+        -token_hash: str
+        +expira: datetime
+    }
+    class Cliente {
+        <<clients>>
+        +user_id: str
+        +nombre: str
+        +email: str
+        +telefono: str
+        +direccion: str
+        +comuna: str
+    }
+    class Producto {
+        <<inventory>>
+        +id: str
+        +nombre: str
+        +descripcion: str
+        +precio: int
+        +categoria: str
+        +stock: int
+        +tags: list~str~
+        +alergenos: list~str~
+        +activo: bool
+    }
+    class Imagen {
+        <<inventory>>
+        +id: str
+        +posicion: int
+        +url o datos
+    }
+    class Reserva {
+        <<inventory>>
+        +pedido_id: int
+        +cantidad: int
+        +estado: reservada|confirmada|liberada
+    }
+    class Pedido {
+        <<orders>>
+        +id: int
+        +user_id: str
+        +estado: EstadoPedido
+        +entrega: retiro|delivery
+        +direccion: str
+        +subtotal: int
+        +costo_envio: int
+        +total: int
+        +metodo_pago: str
+    }
+    class ItemPedido {
+        <<orders>>
+        +producto_id: str
+        +nombre: str
+        +precio_unitario: int
+        +cantidad: int
+    }
+    class EventoPedido {
+        <<orders>>
+        +estado_anterior: str
+        +estado_nuevo: str
+        +actor: str
+        +creado: datetime
+    }
+    class Pago {
+        <<payments>>
+        +id: str
+        +pedido_id: int
+        +monto: int
+        +metodo: str
+        +estado: pendiente|aprobado|rechazado|anulado
+    }
+    class AvisoProveedor {
+        <<payments>>
+        +evento_id: str
+        +estado: str
+    }
+
+    Usuario "1" -- "0..*" Sesion : abre
+    Usuario "1" -- "0..1" Cliente : perfil
+    Producto "1" *-- "0..5" Imagen : contiene
+    Producto "1" -- "0..*" Reserva : aparta stock
+    Cliente "1" -- "0..*" Pedido : realiza
+    Pedido "1" *-- "1..*" ItemPedido : detalle
+    Pedido "1" *-- "1..*" EventoPedido : historial
+    ItemPedido "0..*" ..> "1" Producto : copia nombre y precio
+    Pedido "1" -- "0..*" Pago : intentos
+    Pago "1" -- "0..*" AvisoProveedor : avisos
+
+    class CatalogService {
+        <<service>>
+        +S01 consultarCatalogo(filtro) ProductoDTO[]
+        +S02 consultarProducto(id) ProductoDTO
+        +S04 crearProducto(form) ProductoDTO
+        +S05 reemplazarProducto(id, form) ProductoDTO
+        +S06 darDeBaja(id)
+    }
+    class OrderService {
+        <<service>>
+        +S07 crearPedido(items, entrega) PedidoDTO
+        +S08 misPedidos() PedidoDTO[]
+        +S09 verPedido(id) PedidoDTO
+        +S10 cancelar(id) PedidoDTO
+        +S11 todosLosPedidos(estado) PedidoDTO[]
+        +S12 cambiarEstado(id, estado) PedidoDTO
+    }
+    class ClientService {
+        <<service>>
+        +S13 miPerfil() ClienteDTO
+        +S14 guardarPerfil(perfil) ClienteDTO
+        +S15 listarClientes() ClienteDTO[]
+    }
+    class PaymentService {
+        <<service>>
+        +S16 iniciarPago(pedido_id) PagoDTO
+        +S17 recibirAviso(firma, cuerpo)
+        +S18 confirmarTransferencia(pago_id) PagoDTO
+    }
+    class AuthService {
+        <<service>>
+        +A01 login(usuario, clave) Identidad
+        +A02 registrar(usuario, clave) Identidad
+        +A03 introspect(token) Identidad
+        +A04 logout(token)
+    }
+    class ProductoDTO {
+        <<dto>>
+        id, nombre, precio, stock, disponible, tags, imagenes
+    }
+    class PedidoDTO {
+        <<dto>>
+        id, estado, items, subtotal, costo_envio, total, eventos
+    }
+
+    CatalogService ..> Producto : usa
+    CatalogService ..> ProductoDTO : devuelve
+    OrderService ..> Pedido : usa
+    OrderService ..> PedidoDTO : devuelve
+    OrderService ..> CatalogService : reserva stock
+    PaymentService ..> Pago : usa
+    PaymentService ..> OrderService : marca pagado
+    ClientService ..> Cliente : usa
+    AuthService ..> Usuario : usa
